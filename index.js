@@ -9,6 +9,13 @@ const checkLinks = () => new Promise (async (resolve, reject) => {
         var links = await fs.readFile('./links.json')
         links = JSON.parse(links)
 
+        try {
+            await fs.mkdir('./downloads');
+            console.log('[#] download directory created')
+        } catch (err) {
+            console.log('[#] download directory exists')
+        }
+
         resolve({
             status: "success",
             code: "read",
@@ -118,9 +125,11 @@ const readPage = (details) => new Promise ((resolve, reject) => {
             var code = details[i].url.split("g/");
             code = code[1].replace(/[^\w\s]/gi, '');
 
+            console.log('[#] Reading Page URL')
             scrapPage(details[i].url)
             .then(response => {
-                console.log(response)
+                console.log('[#] Trying to Download: ' + response.data.title.toString())
+
                 // delete directory
                 fsSync.rm('./downloads/' + response.data.title.toString(), { recursive: true, force: true }, (err) => {
                     if (err) { return console.error(err); }
